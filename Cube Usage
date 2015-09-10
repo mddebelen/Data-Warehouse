@@ -1,0 +1,9 @@
+SELECT substring([MSOLAP_ObjectPath],10,patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) - 1) as DBName,
+	   substring([MSOLAP_ObjectPath],10 + patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) , 
+       patindex('%.%', substring([MSOLAP_ObjectPath],10 + patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) , LEN([MSOLAP_ObjectPath])))-1) as Cube,
+	   Count(*) as UsageNumber, Max(StartTime) as LastUsage
+FROM [dbo].[OlapQueryLog]
+GROUP BY substring([MSOLAP_ObjectPath],10 + patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) , 
+		 patindex('%.%', substring([MSOLAP_ObjectPath],10 + patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) , LEN([MSOLAP_ObjectPath])))-1),
+		 substring([MSOLAP_ObjectPath],10,patindex('%.%',substring([MSOLAP_ObjectPath],10,LEN([MSOLAP_ObjectPath]))) - 1)
+Order By 'LastUsage', 'DBName', 'UsageNumber' Desc
